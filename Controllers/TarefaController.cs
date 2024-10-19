@@ -19,25 +19,23 @@ namespace TrilhaApiDesafio.Controllers
         public IActionResult ObterPorId(int id)
         {
             var tarefa = _context.Tarefas.Find(id);
-
             if (tarefa == null)
                 return NotFound();
-
-            return Ok(tarefa); 
+            return Ok();
         }
 
         [HttpGet("ObterTodos")]
         public IActionResult ObterTodos()
         {
-            var tarefa = _context.Tarefas.ToList();
-            return Ok(tarefa);
+            var tarefas = _context.Tarefas;
+            return Ok();
         }
 
         [HttpGet("ObterPorTitulo")]
         public IActionResult ObterPorTitulo(string titulo)
         {
-            var tarefa = _context.Tarefas.Where(x => x.Titulo.Contains(titulo));
-            return Ok(tarefa);
+            var tarefas = _context.Tarefas.Where(t => t.Titulo.Contains(titulo));
+            return Ok();
         }
 
         [HttpGet("ObterPorData")]
@@ -50,6 +48,7 @@ namespace TrilhaApiDesafio.Controllers
         [HttpGet("ObterPorStatus")]
         public IActionResult ObterPorStatus(EnumStatusTarefa status)
         {
+            var tarefas = _context.Tarefas.Where(t => t.Status == status);
             var tarefa = _context.Tarefas.Where(x => x.Status == status);
             return Ok(tarefa);
         }
@@ -60,9 +59,7 @@ namespace TrilhaApiDesafio.Controllers
             if (tarefa.Data == DateTime.MinValue)
                 return BadRequest(new { Erro = "A data da tarefa não pode ser vazia" });
 
-
-            _context.Add(tarefa);
-            _context.SaveChanges();
+            _context.Tarefas.Add(tarefa);
             return CreatedAtAction(nameof(ObterPorId), new { id = tarefa.Id }, tarefa);
         }
 
@@ -77,15 +74,11 @@ namespace TrilhaApiDesafio.Controllers
             if (tarefa.Data == DateTime.MinValue)
                 return BadRequest(new { Erro = "A data da tarefa não pode ser vazia" });
 
-                tarefaBanco.Titulo = tarefa.Titulo;
-                tarefaBanco.Descricao = tarefa.Descricao;
-                tarefaBanco.Data = tarefa.Data;
-                tarefaBanco.Status = tarefa.Status;
-
-                _context.Tarefas.Update(tarefaBanco);
-                _context.SaveChanges();
-
-
+            tarefaBanco.Titulo = tarefa.Titulo;
+            tarefaBanco.Descricao = tarefa.Descricao;
+            tarefaBanco.Data = tarefa.Data;
+            tarefaBanco.Status = tarefa.Status;
+            _context.Tarefas.Update(tarefaBanco);
             return Ok(tarefaBanco);
         }
 
@@ -98,8 +91,7 @@ namespace TrilhaApiDesafio.Controllers
                 return NotFound();
 
             _context.Tarefas.Remove(tarefaBanco);
-            _context.SaveChanges();
-
+            return Ok(tarefaBanco);
             return NoContent();
         }
     }
